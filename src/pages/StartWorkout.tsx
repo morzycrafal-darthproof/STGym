@@ -51,9 +51,11 @@ export function StartWorkout() {
               </button>
             </div>
             {next ? (
-              <button className="btn primary" style={{ justifyContent: 'flex-start' }} onClick={() => start({ planId: plan.id, weekId: next.week.id, dayId: next.day.id })}>
+              <button className="btn primary block" onClick={() => start({ planId: plan.id, weekId: next.week.id, dayId: next.day.id })}>
                 <Icon name="play" size={16} />
-                Następny: {next.week.name.split(':')[0]} · {next.day.name}
+                <span className="grow">
+                  Następny: {next.week.name.split(':')[0]} · {next.day.name}
+                </span>
               </button>
             ) : (
               <p className="muted small">Wszystkie dni z tego planu są już wykonane. Dodaj kolejny tydzień w edytorze.</p>
@@ -65,15 +67,12 @@ export function StartWorkout() {
                   {w.days.map((d) => (
                     <button
                       key={d.id}
-                      className="btn"
-                      style={{ justifyContent: 'flex-start' }}
+                      className="btn block"
                       disabled={!d.exercises.length}
                       onClick={() => start({ planId: plan.id, weekId: w.id, dayId: d.id })}
                     >
                       {doneIds.has(d.id) ? <Icon name="check" size={16} /> : <Icon name="play" size={14} />}
-                      <span className="grow" style={{ textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {d.name}
-                      </span>
+                      <span className="grow">{d.name}</span>
                       <span className="muted small">{d.exercises.length} ćw.</span>
                     </button>
                   ))}

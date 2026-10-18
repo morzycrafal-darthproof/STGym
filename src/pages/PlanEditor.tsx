@@ -213,7 +213,7 @@ function ExerciseEditor({
 }) {
   return (
     <div className={`exercise stack ${ex.superset ? 'in-ss' : ''}`} style={{ gap: 8 }}>
-      <div className="row" style={{ gap: 6 }}>
+      <div className="row ex-head" style={{ gap: 6 }}>
         <span className="muted small" style={{ width: 18 }}>
           {index + 1}.
         </span>
@@ -231,6 +231,7 @@ function ExerciseEditor({
           }
           style={{ fontWeight: 600 }}
         />
+        <div className="controls">
         <LiftSelect value={ex.lift} onChange={(lift) => onChange((x) => (x.lift = lift))} />
         <input
           style={{ width: 54 }}
@@ -248,6 +249,7 @@ function ExerciseEditor({
         <button className="btn ghost icon danger" title="Usuń ćwiczenie" onClick={onDelete}>
           <Icon name="trash" size={16} />
         </button>
+        </div>
       </div>
 
       <table className="sets-table">

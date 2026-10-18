@@ -190,3 +190,19 @@ label.field { display: flex; flex-direction: column; gap: 4px; font-size: 0.85re
 .name-row > .controls { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
 @media (max-width: 720px) { input.title-input { font-size: 1.15rem; } h1 { font-size: 1.35rem; } }
+
+/* Full-width buttons with long labels (plan day names) wrap instead of overflowing. */
+.btn.block { width: 100%; justify-content: flex-start; text-align: left; white-space: normal; }
+.btn.block > svg { flex-shrink: 0; }
+.btn.block > span { min-width: 0; overflow-wrap: anywhere; }
+
+/* Safety net: nothing may widen the page past the screen, or phones zoom out and the bottom bar drifts off. */
+html, body { max-width: 100%; overflow-x: clip; }
+.card, .list-item, .row > * { min-width: 0; }
+
+/* Exercise header: the name keeps a usable width; lift/superset/move controls wrap below on phones. */
+.ex-head > input.grow { flex: 1 1 200px; }
+.ex-head > .controls { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+@media (max-width: 720px) {
+  .sets-table input { padding: 5px 6px; }
+}
