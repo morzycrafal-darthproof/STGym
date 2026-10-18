@@ -14,7 +14,10 @@ export function Layout() {
     <div className="app">
       <header className="topbar">
         <NavLink to="/" className="brand">
-          ST<span>Gym</span>
+          <img src="/favicon.svg" alt="" width={26} height={26} />
+          <span>
+            ST<b>Gym</b>
+          </span>
         </NavLink>
         <nav className="nav">
           {LINKS.map((l) => (
