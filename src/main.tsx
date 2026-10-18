@@ -10,7 +10,11 @@ import { Workout } from './pages/Workout'
 import { History } from './pages/History'
 import { Progress } from './pages/Progress'
 import { Settings } from './pages/Settings'
+import { requestPersistentStorage } from './lib/backup'
 import './index.css'
+
+// Ask the browser not to evict localStorage under storage pressure.
+requestPersistentStorage()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

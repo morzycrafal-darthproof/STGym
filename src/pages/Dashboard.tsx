@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { Icon } from '../components/Icon'
 import { LiftTiles } from '../components/LiftTiles'
+import { dismissBackupReminder, exportData, needsBackupReminder, sessionsSince, useBackupMeta } from '../lib/backup'
 import { doneSets, sessionTonnage } from '../lib/stats'
 import { fmt, formatDate } from '../lib/util'
 import { nextDay, useStore } from '../store'
@@ -10,6 +11,8 @@ export function Dashboard() {
   const sessions = useStore((s) => s.sessions)
   const startSession = useStore((s) => s.startSession)
   const navigate = useNavigate()
+  const backup = useBackupMeta()
+  const unsaved = sessionsSince(sessions, backup.lastExportAt)
 
   const recent = [...sessions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
   const inProgress = recent.find((s) => !s.finishedAt)
@@ -25,6 +28,28 @@ export function Dashboard() {
           <p className="muted">{sessions.length ? `${sessions.length} zalogowanych treningów` : 'Zacznij od pierwszego treningu z planu.'}</p>
         </div>
       </div>
+
+      {needsBackupReminder(sessions, backup) && (
+        <div className="card stack" style={{ borderColor: 'var(--danger)' }}>
+          <div className="row between" style={{ flexWrap: 'nowrap', alignItems: 'flex-start' }}>
+            <div className="grow stack" style={{ gap: 2 }}>
+              <h2>Zrób kopię zapasową</h2>
+              <span className="muted small">
+                {backup.lastExportAt ? `Ostatni eksport: ${formatDate(new Date(backup.lastExportAt).toLocaleDateString('sv-SE'))}.` : 'Nie było jeszcze eksportu.'}{' '}
+                Treningi bez kopii: {unsaved}. Dane są zapisane tylko w tej przeglądarce.
+              </span>
+            </div>
+            <button className="btn ghost icon" aria-label="Przypomnij później" title="Przypomnij później" onClick={dismissBackupReminder}>
+              ✕
+            </button>
+          </div>
+          <div>
+            <button className="btn primary" onClick={() => exportData({ plans, sessions })}>
+              Eksportuj kopię
+            </button>
+          </div>
+        </div>
+      )}
 
       {inProgress ? (
         <Link to={`/trening/${inProgress.id}`} className="card row" style={{ borderColor: 'var(--accent)' }}>

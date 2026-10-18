@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { today } from '../lib/util'
+import { useEffect, useRef, useState } from 'react'
+import { exportData, requestPersistentStorage, useBackupMeta, type PersistState } from '../lib/backup'
 import { useStore } from '../store'
 import type { AppData } from '../types'
 
@@ -10,15 +10,12 @@ export function Settings() {
   const addSeedPlans = useStore((s) => s.addSeedPlans)
   const fileRef = useRef<HTMLInputElement>(null)
   const [msg, setMsg] = useState('')
+  const [persist, setPersist] = useState<PersistState | null>(null)
+  const { lastExportAt } = useBackupMeta()
 
-  const exportData = () => {
-    const blob = new Blob([JSON.stringify({ plans, sessions } satisfies AppData, null, 2)], { type: 'application/json' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `stgym-${today()}.json`
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
+  useEffect(() => {
+    requestPersistentStorage().then(setPersist)
+  }, [])
 
   const importData = async (file: File) => {
     try {
@@ -41,8 +38,14 @@ export function Settings() {
           Dane są zapisane tylko w tej przeglądarce ({plans.length} planów, {sessions.length} treningów). Eksportuj je regularnie, żeby ich nie stracić
           i żeby przenieść je na inne urządzenie.
         </p>
+        <p className="small">
+          Ostatni eksport:{' '}
+          {lastExportAt
+            ? new Date(lastExportAt).toLocaleString('pl-PL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : 'jeszcze nie było'}
+        </p>
         <div className="row">
-          <button className="btn primary" onClick={exportData}>
+          <button className="btn primary" onClick={() => exportData({ plans, sessions })}>
             Eksportuj JSON
           </button>
           <button className="btn" onClick={() => fileRef.current?.click()}>
@@ -51,6 +54,24 @@ export function Settings() {
           <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => e.target.files?.[0] && importData(e.target.files[0])} />
         </div>
         {msg && <p className="small">{msg}</p>}
+      </div>
+      <div className="card stack" style={{ borderColor: 'var(--danger)' }}>
+        <h2>Uwaga: czyszczenie danych Chrome</h2>
+        <p className="small">
+          Wyczyszczenie danych witryny <b style={{ overflowWrap: 'anywhere' }}>morzycrafal-darthproof.github.io</b> w Chrome (także przy czyszczeniu
+          historii z zaznaczonymi „plikami cookie i danymi witryn”) <b>usuwa też wszystkie dane zainstalowanej aplikacji</b> — plany i treningi.
+          Zanim cokolwiek wyczyścisz, zrób eksport JSON.
+        </p>
+        <p className="muted small">
+          Trwała pamięć:{' '}
+          {persist === null
+            ? 'sprawdzanie…'
+            : persist === 'persisted'
+              ? 'włączona — przeglądarka nie usunie danych sama przy braku miejsca.'
+              : persist === 'not-persisted'
+                ? 'wyłączona — przeglądarka może sama usunąć dane przy braku miejsca. Zainstalowanie aplikacji na ekranie głównym zwykle to zmienia.'
+                : 'ta przeglądarka jej nie obsługuje.'}
+        </p>
       </div>
       <div className="card stack">
         <h2>Dane przykładowe</h2>
