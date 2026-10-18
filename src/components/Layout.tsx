@@ -14,7 +14,7 @@ export function Layout() {
     <div className="app">
       <header className="topbar">
         <NavLink to="/" className="brand">
-          <img src="/favicon.svg" alt="" width={26} height={26} />
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={26} height={26} />
           <span>
             ST<b>Gym</b>
           </span>
